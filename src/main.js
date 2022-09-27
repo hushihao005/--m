@@ -13,6 +13,9 @@ import './styles/index.less'
 // 导入 动态设置Rem基准值组件
 import 'amfe-flexible'
 
+// 导入 dayjs文件处理时间
+import '@/utils/dayjs'
+
 // 注册使用vant组件库
 Vue.use(Vant)
 

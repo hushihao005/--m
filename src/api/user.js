@@ -30,3 +30,11 @@ export const getUserInfo = () => {
     // 在request.js里通过请求拦截器完成了上面发送给后端的授权信息-token的操作
   })
 }
+
+// 获取频道列表
+export const getUserChannels = () => {
+  return request({
+    method: 'GET',
+    url: '/v1_0/user/channels'
+  })
+}
