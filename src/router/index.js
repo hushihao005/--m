@@ -17,7 +17,8 @@ const routes = [
       { path: '/video', name: 'VideoIndex', component: () => import('@/views/video/index.vue') },
       { path: '/my', name: 'MyIndex', component: () => import('@/views/my/index.vue') }
     ]
-  }
+  },
+  { path: '/search', name: 'Search', component: () => import('@/views/search/index.vue') }
 ]
 
 const router = new VueRouter({
