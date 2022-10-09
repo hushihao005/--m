@@ -18,7 +18,16 @@ const routes = [
       { path: '/my', name: 'MyIndex', component: () => import('@/views/my/index.vue') }
     ]
   },
-  { path: '/search', name: 'Search', component: () => import('@/views/search/index.vue') }
+  { path: '/search', name: 'Search', component: () => import('@/views/search/index.vue') },
+  // 动态路由
+  {
+    path: '/article/:articleId',
+    name: 'Article',
+    component: () => import('@/views/article/index.vue'),
+    // 开启props 传递路由参数, 把路由参数传到组件对应的props属性里
+    // *props里的属性名得是跟要传的路由参数名一致
+    props: true
+  }
 ]
 
 const router = new VueRouter({

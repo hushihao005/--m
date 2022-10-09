@@ -19,6 +19,7 @@
           :key="index"
           :title="item.title"
         /> -->
+        <!-- 文章列表项 -->
         <ArticleItem
           v-for="(item, index) in list"
           :key="index"
