@@ -43,7 +43,12 @@ export default {
         this.$emit('changeAttitude', status)
         this.$toast.success(status === 1 ? '点赞成功' : '取消点赞')
       } catch (error) {
-        this.$toast('操作失败, 请重试')
+        if (error.response.status === 401) {
+          this.$router.push('/login')
+          this.$toast('请先登录')
+        } else {
+          this.$toast('操作失败, 请重试')
+        }
       }
       this.loading = false
     }

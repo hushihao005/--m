@@ -58,8 +58,12 @@ export default {
         if (error.response && error.response.status === 400) {
           this.$toast('不能关注自己')
         }
-        console.log(error)
-        this.$toast('操作失败! 请重试')
+        if (error.response.status === 401) {
+          this.$router.push('/login')
+          this.$toast('请先登录')
+        } else {
+          this.$toast('操作失败, 请重试')
+        }
       }
       this.followLoading = false
     }

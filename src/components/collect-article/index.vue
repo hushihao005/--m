@@ -42,7 +42,12 @@ export default {
         // 这里取非是因为要提交父组件修改值, 但是这里父组件还没修改好就用了, 所以要取非
         this.$toast.success(!this.value ? '收藏成功' : '取消收藏')
       } catch (error) {
-        this.$toast('操作失败, 请重试')
+        if (error.response.status === 401) {
+          this.$router.push('/login')
+          this.$toast('请先登录')
+        } else {
+          this.$toast('操作失败, 请重试')
+        }
       }
 
       this.loading = false
