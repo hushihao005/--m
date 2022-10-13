@@ -13,7 +13,7 @@
           <span class="name">{{userInfo.name}}</span>
         </div>
         <div class="right">
-          <van-button size="mini" round>编辑资料</van-button>
+          <van-button size="mini" round to="/user/profile">编辑资料</van-button>
         </div>
       </div>
       <div class="data-status">
@@ -106,7 +106,12 @@ export default {
         this.userInfo = data.data
         console.log(data)
       } catch (error) {
-        this.$toast('获取用户信息失败, 请稍后重试')
+        if (error.response.status === 401) {
+          this.$router.push('./login')
+          this.$toast('请登录')
+        } else {
+          this.$toast('获取用户信息失败, 请稍后重试')
+        }
       }
     }
   }

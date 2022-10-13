@@ -73,13 +73,26 @@
           ref="article-content"
         ></div>
         <van-divider>正文结束</van-divider>
+        <!-- 文章评论列表 -->
+        <commentList
+          :commentID="article.art_id"
+          @getTotalData="setTotalData"
+          :list="commentList"
+          @reply-click = "onReplyClick"
+        ></commentList>
 
         <!-- 底部区域 -->
         <div class="article-bottom">
-          <van-button class="comment-btn" type="default" round size="small"
+          <van-button
+            class="comment-btn"
+            type="default"
+            round
+            size="small"
+            @click="isPostCommentShow = true"
             >写评论</van-button
           >
-          <van-icon name="comment-o" badge="123" color="#777" />
+          <!-- 评论数量 -->
+          <van-icon name="comment-o" :badge="totalCount" color="#777" />
           <!-- 收藏按钮 <van-icon color="#777" name="star-o" /> -->
           <collectArticle
             class="btn-item"
@@ -87,10 +100,22 @@
             :articleID="article.art_id"
           />
           <!-- 点赞按钮 <van-icon color="#777" name="good-job-o" /> -->
-          <likeArticle :attitude = "article.attitude" :articleID="article.art_id" @changeAttitude = "changeCount"/>
+          <likeArticle
+            :attitude="article.attitude"
+            :articleID="article.art_id"
+            @changeAttitude="changeCount"
+          />
           <van-icon name="share" color="#777777"></van-icon>
         </div>
         <!-- /底部区域 -->
+
+        <!-- 发布评论弹出层 -->
+        <van-popup v-model="isPostCommentShow" position="bottom">
+          <commentPost
+            :target="article.art_id"
+            @post-success="OnPostSuccess"
+          ></commentPost>
+        </van-popup>
       </div>
       <!-- /加载完成-文章详情 -->
 
@@ -109,6 +134,15 @@
       </div>
       <!-- /加载失败：其它未知错误（例如网络原因或服务端异常） -->
     </div>
+
+    <!-- 评论回复 -->
+    <!-- 弹出层是懒加载的, 只有第一次展示的时候会渲染里面的内容
+         所以会出现评论列表内的评论一直是第一次渲染的内容,不会重复获取
+         可以通过v-if, 去控制渲染节点 true->渲染节点 false->销毁节点
+    -->
+    <van-popup v-model="isReplayShow" position="bottom" style="height: 100%">
+      <commentReply v-if="isReplayShow" :comment = "currentComment" @click-close = "isReplayShow = false"></commentReply>
+    </van-popup>
   </div>
 </template>
 
@@ -118,8 +152,17 @@ import { ImagePreview } from 'vant'
 import followuser from '@/components/follow-user'
 import collectArticle from '@/components/collect-article'
 import likeArticle from '@/components/like-article'
+import commentList from './components/commentList.vue'
+import commentPost from './components/comment-post.vue'
+import commentReply from './components/comment-reply.vue'
 export default {
   name: 'Article',
+  // 给所有的后代组件提供数据
+  provide: function () {
+    return {
+      articleId: this.articleId
+    }
+  },
   data () {
     return {
       // 文章详情
@@ -127,10 +170,21 @@ export default {
       // 加载中的loading状态
       loading: true,
       // 失败的状态码
-      errorStatus: 0
+      errorStatus: 0,
+      // 评论数量
+      totalCount: 0,
+      // 控制评论弹出层显示/隐藏
+      isPostCommentShow: false,
+      commentList: [],
+      // 评论回复弹出层
+      isReplayShow: false,
+      // 点击回复评论用到的数据
+      currentComment: {}
     }
   },
   props: {
+    // 路由传递过来的
+    // 开启props 传递路由参数, 把路由参数传到组件对应的props属性里
     articleId: {
       type: [Number, String, Object],
       required: true
@@ -139,7 +193,10 @@ export default {
   components: {
     followuser,
     collectArticle,
-    likeArticle
+    likeArticle,
+    commentList,
+    commentPost,
+    commentReply
   },
   created () {
     this.loadArticle()
@@ -190,6 +247,22 @@ export default {
     },
     changeCount (status) {
       this.article.attitude = status
+    },
+    setTotalData (data) {
+      this.totalCount = data.total_count
+    },
+    OnPostSuccess (data) {
+      // 关闭弹出层
+      // 将发布的内容显示到列表顶部
+      this.isPostCommentShow = false
+      // console.log(data)
+      this.commentList.unshift(data.new_obj)
+    },
+    onReplyClick (comment) {
+      // console.log(comment)
+      this.currentComment = comment
+      // 显示评论回复弹出层
+      this.isReplayShow = true
     }
   }
 }
