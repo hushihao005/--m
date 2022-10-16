@@ -8,8 +8,10 @@
       @click-left="$router.back()"
     ></van-nav-bar>
 
+    <input type="file" hidden ref="file" @change="OnChange">
+
     <!-- 个人信息 -->
-    <van-cell title="头像" is-link>
+    <van-cell title="头像" is-link center @click="$refs.file.click()">
       <van-image
         class="avator"
         fit="cover"
@@ -35,6 +37,11 @@
     <van-popup v-model="isupdateDateShow" position="bottom">
       <updateDate v-if="isupdateDateShow" v-model="user.birthday" @close="isupdateDateShow=false"></updateDate>
     </van-popup>
+
+    <!-- 编辑头像弹出层 -> 在选完文件后弹出 -->
+    <van-popup v-model="isupdatePhotoShow" position="bottom" style="height:100%">
+      <updatePhoto v-if="isupdatePhotoShow" :img="photoSrc" @close="isupdatePhotoShow=false" @updatePhoto = 'user.photo = $event'></updatePhoto>
+    </van-popup>
   </div>
 </template>
 
@@ -43,19 +50,23 @@ import { GetUserProfile } from '@/api/user'
 import UpdateName from './components/updateName.vue'
 import UpdateGender from './components/updateGender.vue'
 import updateDate from './components/updateDate.vue'
+import updatePhoto from './components/updatePhoto.vue'
 export default {
   name: 'UserProfile',
   components: {
     UpdateName,
     UpdateGender,
-    updateDate
+    updateDate,
+    updatePhoto
   },
   data () {
     return {
       user: {},
       isupdateNameShow: false,
       isupdateGenderShow: false,
-      isupdateDateShow: false
+      isupdateDateShow: false,
+      isupdatePhotoShow: false,
+      photoSrc: ''
     }
   },
   created () {
@@ -70,6 +81,19 @@ export default {
       } catch (error) {
         this.$toast('获取信息失败, 请稍后再试')
       }
+    },
+    OnChange () {
+      // 获取文件对象
+      const file = this.$refs.file.files[0]
+      // 基于文章对象获取blob数据
+      const data = window.URL.createObjectURL(file)
+      console.log(data)
+      this.photoSrc = data
+      this.isupdatePhotoShow = true
+
+      // file-input如果重复选中一个文件 不会触发change事件
+      // 解决方法就是每次清空file的value
+      this.$refs.file.value = ''
     }
   }
 }
